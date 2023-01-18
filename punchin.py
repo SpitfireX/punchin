@@ -9,7 +9,12 @@ from time import sleep
 from datetime import datetime, timedelta
 from pathlib import Path
 
-historyfile = Path('~/.punchin.csv').expanduser()
+parser = argparse.ArgumentParser(description='Track time intervals in a CSV file.')
+parser.add_argument('-f', type=Path, required=False,
+                    default=Path('~/.punchin.csv').expanduser(),
+                    help='The CSV file to write time intervals to. Default location: ~/.punchin.csv')
+
+historyfile = parser.parse_args().f
 
 intervals = []
 start = datetime.now()
@@ -26,6 +31,9 @@ else:
 
 def sigint(signum, frame):
     global intervals, start
+
+    # Make ^C do nothing
+    signal.signal(signal.SIGINT, lambda x, y: None)
 
     now = datetime.now()
     note = input('\nnote for current interval: ')
